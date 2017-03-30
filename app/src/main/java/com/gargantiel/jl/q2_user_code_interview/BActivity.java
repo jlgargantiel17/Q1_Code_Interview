@@ -35,6 +35,8 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,11 +90,14 @@ public class BActivity extends AppCompatActivity {
 
             private Filter filter;
 
+            String deviderVariable = new String("");
             @Override
             public View getView(final int position, View convertView, ViewGroup parent) {
 
                 LayoutInflater inflater = (LayoutInflater) BActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View row = inflater.inflate(R.layout.contact_list_item, parent, false);
+
+
 
                 TextView name = (TextView) row.findViewById(R.id.name);
                 TextView number = (TextView) row.findViewById(R.id.number);
@@ -102,6 +107,20 @@ public class BActivity extends AppCompatActivity {
                 if (this.getItem(position).get("isSelected").equals("1")){
                     checkBox.setChecked(true);
                 }
+
+                LinearLayout divider_layout = (LinearLayout) row.findViewById(R.id.divider_layout);
+                TextView divider = (TextView) row.findViewById(R.id.divider);
+                try{
+                    if(!(deviderVariable.toUpperCase().charAt(0) == this.getItem(position).get("name").toUpperCase().charAt(0))){
+                        divider_layout.setVisibility(View.VISIBLE);
+                        divider.setText(deviderVariable.toUpperCase().charAt(0));
+                    }
+                }catch(Exception e){
+                    divider_layout.setVisibility(View.VISIBLE);
+                    divider.setText(this.getItem(position).get("name").toUpperCase().charAt(0)+"");
+                }
+
+                deviderVariable = this.getItem(position).get("name");
 
                 checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
                 {
