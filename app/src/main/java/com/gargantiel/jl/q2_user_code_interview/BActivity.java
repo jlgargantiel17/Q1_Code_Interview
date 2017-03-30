@@ -13,6 +13,8 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -82,11 +84,29 @@ public class BActivity extends AppCompatActivity {
         avatarLayout = (LinearLayout) findViewById(R.id.avatarLayout);
         scrollView = (HorizontalScrollView) findViewById(R.id.scrollview);
 
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                ArrayAdapter<HashMap<String, String>> adapter = (ArrayAdapter<HashMap<String, String>>) BActivity.this.contacts_list.getAdapter();
+                adapter.getFilter().filter(s);
+            }
+        });
+
         contacts_list.setAdapter(new ArrayAdapter<HashMap<String, String>>(this, R.layout.contact_list_item, R.id.name, contactList) {
 
             //Filter Variables
-//            public ArrayList<HashMap<String, String>> filtered;
-//            ArrayList<HashMap<String, String>> items;
+            public ArrayList<HashMap<String, String>> filtered;
+            ArrayList<HashMap<String, String>> items;
 
             private Filter filter;
 
@@ -147,62 +167,63 @@ public class BActivity extends AppCompatActivity {
 
                 return row;
             }
+
             //This is the filter for search implementation not functional yet
 
-//            @Override
-//            public Filter getFilter() {
-//                if (filter == null) {
-//                    items = new ArrayList<Structure_Delivery>();
-//                    for (int index = 0; index < super.getCount(); index++)
-//                        items.add(super.getItem(index));
-//                    filter = new ManageFilter();
-//                }
-//                return filter;
-//            }
-//
-//            class ManageFilter extends Filter {
-//
-//                @Override
-//                protected FilterResults performFiltering(CharSequence constraint) {
-//                    // NOTE: this function is *always* called from a background thread, and
-//                    // not the UI thread.
-//                    constraint = constraint.toString().toLowerCase();
-//                    FilterResults result = new FilterResults();
-//                    if (constraint != null && constraint.toString().length() > 0) {
-//                        ArrayList<Structure_Delivery> filtered = new ArrayList<Structure_Delivery>();
-//                        ArrayList<Structure_Delivery> lItems = new ArrayList<Structure_Delivery>();
-//                        synchronized (this) {
-//                            lItems.addAll(items);
-//                        }
-//                        for (int i = 0, l = lItems.size(); i < l; i++) {
-//                            Structure_Delivery m = lItems.get(i);
-//                            if (m.getOrderFrom().toLowerCase().contains(constraint) || m.getDeliveryAddressDisplay().toLowerCase().contains(constraint) || m.getDeliveryStatusDisplay().toLowerCase().contains(constraint))
-//                                filtered.add(m);
-//                        }
-//                        result.count = filtered.size();
-//                        result.values = filtered;
-//                    } else {
-//                        synchronized (this) {
-//                            result.values = items;
-//                            result.count = items.size();
-//                        }
-//                    }
-//                    return result;
-//                }
-//
-//                @SuppressWarnings("unchecked")
-//                @Override
-//                protected void publishResults(CharSequence constraint, FilterResults results) {
-//                    // NOTE: this function is *always* called from the UI thread.
-//                    filtered = (ArrayList<Structure_Delivery>) results.values;
-//                    notifyDataSetChanged();
-//                    clear();
-//                    for (int i = 0, l = filtered.size(); i < l; i++)
-//                        add(filtered.get(i));
-//                    notifyDataSetInvalidated();
-//                }
-//
-//            }
+            @Override
+            public Filter getFilter() {
+                if (filter == null) {
+                    items = new ArrayList<HashMap<String, String>>();
+                    for (int index = 0; index < super.getCount(); index++)
+                        items.add(super.getItem(index));
+                    filter = new ManageFilter();
+                }
+                return filter;
+            }
+
+            class ManageFilter extends Filter {
+
+                @Override
+                protected FilterResults performFiltering(CharSequence constraint) {
+                    // NOTE: this function is *always* called from a background thread, and
+                    // not the UI thread.
+                    constraint = constraint.toString().toLowerCase();
+                    FilterResults result = new FilterResults();
+                    if (constraint != null && constraint.toString().length() > 0) {
+                        ArrayList<HashMap<String, String>> filtered = new ArrayList<HashMap<String, String>>();
+                        ArrayList<HashMap<String, String>> lItems = new ArrayList<HashMap<String, String>>();
+                        synchronized (this) {
+                            lItems.addAll(items);
+                        }
+                        for (int i = 0, l = lItems.size(); i < l; i++) {
+                            HashMap<String, String> m = lItems.get(i);
+                            if (m.get("name").toLowerCase().contains(constraint) || m.get("name").toLowerCase().contains(constraint))
+                                filtered.add(m);
+                        }
+                        result.count = filtered.size();
+                        result.values = filtered;
+                    } else {
+                        synchronized (this) {
+                            result.values = items;
+                            result.count = items.size();
+                        }
+                    }
+                    return result;
+                }
+
+                @SuppressWarnings("unchecked")
+                @Override
+                protected void publishResults(CharSequence constraint, FilterResults results) {
+                    // NOTE: this function is *always* called from the UI thread.
+                    filtered = (ArrayList<HashMap<String, String>>) results.values;
+                    notifyDataSetChanged();
+                    clear();
+                    for (int i = 0, l = filtered.size(); i < l; i++)
+                        add(filtered.get(i));
+                    notifyDataSetInvalidated();
+                }
+
+            }
 
         });
 
